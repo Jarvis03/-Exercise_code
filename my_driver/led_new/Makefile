@@ -13,4 +13,4 @@ b:
 clean:
 	make -C $(KERNELDIR) M=$(PWD) clean
 
-obj-m:= led_drv.o
+obj-m:= cdev_demo.o
