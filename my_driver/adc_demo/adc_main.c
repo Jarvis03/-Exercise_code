@@ -11,7 +11,7 @@ int main(void)
     int ret = 0;
     unsigned int adc_raw = 0;
     float value = 0.0;
-    if (0 > (fd = open("./adc_drv",O_RDWR))) {
+    if (0 > (fd = open("/dev/adc_dev",O_RDWR))) {
         perror("open error\n");
         return 0;
     }
@@ -26,7 +26,7 @@ int main(void)
        printf("adc:%x\n",adc_raw);
        value = adc_raw * 1.8 / 4096;
        printf("adc value :%f\n",value);
-       sleep(1);
+//       sleep(1);
        memset(buf, 0, 3);
     }
     close(fd);

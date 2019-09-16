@@ -5,12 +5,12 @@ all:
 	make -C $(KERNELDIR) M=$(PWD) modules
 	@echo "build on board"
 	arm-linux-gcc adc_main.c -o adc_main
-	cp adc1_drv.ko adc_main ~/rootfs/
+	cp *.ko adc_main ~/rootfs/
 # M是个变量
-p:
-	make -C $(PCKERNELDIR) M=$(PWD) modules
-	@echo "build on pc"
+#p:
+#	make -C $(PCKERNELDIR) M=$(PWD) modules
+#	@echo "build on pc"
 clean:
 	make -C $(KERNELDIR) M=$(PWD) clean
 
-obj-m:= adc1_drv.o
+obj-m:= adc_int.o

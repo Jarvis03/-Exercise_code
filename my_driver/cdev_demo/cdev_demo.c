@@ -37,7 +37,7 @@ static ssize_t drv_write(struct file *file, const char __user *u_buf,size_t size
         return -EAGAIN;
     }
     printk("cdrv_demo write:%s\n",buf);
-    return 0;
+    return size;
 }
 static ssize_t drv_read(struct file *file,char __user *u_buf, size_t size, loff_t *offset)
 {
@@ -51,7 +51,7 @@ static ssize_t drv_read(struct file *file,char __user *u_buf, size_t size, loff_
         return -EAGAIN;
     }
     printk("cdrv_demo read:%s\n",buf);
-    return 0;
+    return size;
 }
 
 static int drv_release(struct inode* node, struct file *filp)
@@ -88,8 +88,7 @@ static int __init drv_demo_init(void)
     if(ret < 0) {
         goto err2;
     }
-
-    //4. 注册
+//4. 注册
     ret = cdev_add(cdev, devno, TOTAL_OF_DEV);
     if (ret) {
         printk("char device register failed\n");
@@ -136,6 +135,7 @@ static void __exit drv_demo_exit(void)
     cdev_del(cdev);
     unregister_chrdev_region(devno, TOTAL_OF_DEV);
     kfree(cdev);
+    free_irq(73, NULL);
 }
 
 module_init(drv_demo_init)

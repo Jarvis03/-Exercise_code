@@ -80,7 +80,7 @@ static ssize_t drv_write(struct file *file, const char __user *u_buf,size_t size
     *(green_base + GPIO_OUT_SHITF) |= (buf[2] << GREEN_GPIO_SHIFT);
 
     printk("drv_demo write:%d %d %d \n", buf[0],buf[1],buf[2]);
-    return 0;
+    return size;
 }
 static ssize_t drv_read(struct file *file,char __user *u_buf, size_t size, loff_t *offset)
 {
@@ -94,7 +94,7 @@ static ssize_t drv_read(struct file *file,char __user *u_buf, size_t size, loff_
     }
 
     printk("drv_demo read\n");
-    return 0;
+    return size;
 }
 
 static int drv_release(struct inode* node, struct file *filp)

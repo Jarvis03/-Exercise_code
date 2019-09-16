@@ -1,0 +1,1 @@
+cmd_/home/guo/work/exercise_code/my_driver/platfrom/adc_drv/adc_drv.ko := arm-linux-ld -EL -r  -T /home/guo/Downloads/kernel-3.4.39/scripts/module-common.lds --build-id  -o /home/guo/work/exercise_code/my_driver/platfrom/adc_drv/adc_drv.ko /home/guo/work/exercise_code/my_driver/platfrom/adc_drv/adc_drv.o /home/guo/work/exercise_code/my_driver/platfrom/adc_drv/adc_drv.mod.o

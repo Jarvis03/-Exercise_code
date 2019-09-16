@@ -1,0 +1,1 @@
+cmd_/home/guo/work/exercise_code/my_driver/timer/led_timer.ko := arm-linux-ld -EL -r  -T /home/guo/Downloads/kernel-3.4.39/scripts/module-common.lds --build-id  -o /home/guo/work/exercise_code/my_driver/timer/led_timer.ko /home/guo/work/exercise_code/my_driver/timer/led_timer.o /home/guo/work/exercise_code/my_driver/timer/led_timer.mod.o
