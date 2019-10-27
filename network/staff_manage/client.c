@@ -1,6 +1,9 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
 #include <string.h>
 #include "server.h"
 #define  OP_LOGIN  0
@@ -11,6 +14,18 @@
 
 uint32_t  user_opcode = 0;
 struct user user_info;
+int sock;
+
+int sock_read(char *buf, uint32_t len)
+{
+
+    return recv(sock, buf, len, 0);
+}
+int sock_write(char *buf, uint32_t len)
+{
+
+    return send(sock, buf, len, 0);
+}
 uint32_t get_opcode(void)
 {
     char temp[20];
@@ -31,6 +46,7 @@ void ui_login(void)
      fgets(temp, 40, stdin);
      memcpy(user_info.name, temp, strlen(temp));
      printf("login....\n");
+     sock_write("login scuess\n", 13);
      if (ret == 1) {
         user_opcode = OP_MENU;
      } else {
@@ -46,29 +62,29 @@ void ui_display_menu(void)
 
 }
 
-
-
-
-
-
 int  main(void)
 {
 
-    int sock = 0;
+
     int ret = 0;
 
     char str_cmd[CMD_MAX_SIZE];
-#if 0
+#if 1
     sock = socket(AF_INET, SOCK_STREAM, 0 );
     if (sock == -1) {
         perror("socket create failed!\n");
-        return 0;
+        return -1;
     }
-    ret = connect(sock, SERVER_HOST_ADDR, sizeof(SERVER_HOST_ADDR));
+    struct sockaddr_in server;
+    server.sin_family = AF_INET;
+    server.sin_addr.s_addr = inet_addr(SERVER_HOST_ADDR);
+    server.sin_port = htons(8886);
+    ret = connect(sock, (struct sockaddr*)&server, sizeof(server));
     if (ret == -1) {
         perror("socket connect failed!\n");
-        return 0;
+        return -1;
     }
+    printf("conect sucess\n");
 #endif
     while(1) {
         switch(user_opcode) {

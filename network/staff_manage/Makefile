@@ -2,15 +2,18 @@ CC=gcc
 CFLAGS = -g
 
 SOURCE = $(wildcard *.c)
-TARGET = $(notdir $(CURDIR))
-#TARGET = DEMO
+#TARGET = $(notdir $(CURDIR))
+TARGET = server client
 OBJ    = $(patsubst %.c, %.o, $(SOURCE))
 
 #echo build $(TARGET)
 all : $(TARGET)
-	@echo build $(TARGET)
-$(TARGET):$(OBJ)
-	@echo linking $@ $^
+	
+server:server.o
+	@echo server linking $@ $^
+	$(CC) -o $@ $^
+client:client.o
+	@echo client linking $@ $^
 	$(CC) -o $@ $^
 $(OBJ): %.o:%.c
 	@echo compiling $@ $^
