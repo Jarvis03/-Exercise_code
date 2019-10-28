@@ -7,7 +7,7 @@
 #define ADDR_LEN      30
 #define PASSWORD_LEN  15
 
-#define SERVER_HOST_ADDR  "192.168.199.110"
+#define SERVER_HOST_ADDR  "192.168.3.107"
 /*
  * staff information
  */

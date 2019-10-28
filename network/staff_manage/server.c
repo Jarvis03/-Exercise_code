@@ -7,7 +7,84 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/epoll.h>
 #include "server.h"
+
+#if 1
+
+
+
+int main(void)
+{
+    int sockfd;
+    int sock_client;
+    int ret = 0;
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if(sockfd == -1) {
+        perror("socket failed\n");
+        return -1;
+    }
+    struct sockaddr_in sockaddr;
+    sockaddr.sin_addr.s_addr = inet_addr(SERVER_HOST_ADDR);
+    sockaddr.sin_port = htons(8886);
+    sockaddr.sin_family = AF_INET;
+    if(0 > bind(sockfd,(struct sockaddr*)&sockaddr, sizeof(sockaddr))){
+
+        perror("bind error\n");
+        return -1;
+    }
+    if(0 > listen(sockfd, 20)) {
+
+        perror("listen error\n");
+        return -1;
+    }
+    int epfd, epnfds,i;
+    struct epoll_event event;
+    struct epoll_event events[30];
+    epfd = epoll_create(10);
+    event.data.fd = sockfd;
+    event.events = EPOLLIN | EPOLLET;
+    if(epoll_ctl(epfd, EPOLL_CTL_ADD, sockfd, &event)== -1){
+        perror("epoll ctl:");
+        exit(1);
+    }
+    char buf[100];
+    while(1) {
+        epnfds = epoll_wait(epfd, events, 20, -1);
+        if(epnfds == -1){
+            perror("epoll wait");
+            exit(-1);
+        }
+        for (i = 0; i < epnfds; ++i){
+            if(events[i].data.fd == sockfd) {
+                sock_client = accept(sockfd, NULL, 0);
+                if (sock_client == -1) {
+                    perror("accpt");
+                    exit(-1);
+                }
+                event.data.fd = sock_client;
+                event.events = EPOLLIN | EPOLLET;
+
+                if(epoll_ctl(epfd, EPOLL_CTL_ADD, sock_client,&event) == -1){
+                    perror("add client:");
+                    exit(-1);
+                }
+
+
+            } else {
+                memset(buf, 0, 100);
+                if (recv(events[i].data.fd, buf,100,0) <= 0) {
+                    printf("sock close:%d\n", events[i].data.fd);
+                    epoll_ctl(epfd, EPOLL_CTL_DEL, sock_client,&event);
+                }
+                else {
+                    printf("buf:%s\n", buf);
+                }
+            }
+        }
+    }
+}
+#else
 int main(void)
 {
     int sockfd;
@@ -41,11 +118,12 @@ int main(void)
     printf("ready...\n");
     while(1) {
         select_temp = select_fd;
-
-        ret = select(max_fd + 1, &select_fd, NULL, NULL, NULL);
+        printf("maxfd:%d\n",max_fd);
+        ret = select(max_fd + 1, &select_temp, NULL, NULL, NULL);
         printf("event start\n");
         if (ret == -1) {
             perror("select _error\n");
+            return -1;
         } else if (ret == 0) {
             printf("data invalid\n");
         } else {
@@ -57,10 +135,16 @@ int main(void)
             }
             for(i = sockfd + 1; i < max_fd + 1; i++) {
 
-                if(FD_ISSET(i, &select_fd)){
+                if(FD_ISSET(i, &select_temp)){
                     memset(buf, 0, 100);
-                    read(i, buf, 100);
-                    printf("recv:%s\n",buf);
+                    printf("ready recv:%d \n",i);
+                    if(read(i, buf, 100) <= 0) {
+                        close(i);
+                        FD_CLR(i, &select_fd);
+                        printf("close sock:%d\n",i);
+                    } else {
+                       printf("recv:%s\n",buf);
+                    }
                 }
             }
 
@@ -68,3 +152,4 @@ int main(void)
     }
 
 }
+#endif
