@@ -28,7 +28,7 @@ struct tm *p;
     } \
     while(0); \
 }
-#if 1
+#if  !TEST_PIPE
 static void* thread_entery(void* arg)
 {
     int cnt = 0;
@@ -62,14 +62,27 @@ static void* thread_entery(void* arg)
     pclose(fp); 
 }
 #else 
+#define PIPE_NAME "/home/guo/code_test/myfifo"
 static void* thread_entery(void* arg)
 {
     int fd;
     char buf[150];
-    fd = open("./myfifo", O_RDONLY);     //打开fifo文件
-    read(fd, buf, 11);                   //写入数据
-    printf("read result is %s.\n",buf);
-    close(fd);                           //关闭fifo文件 
+    print_log("start pipe 111\n");
+    if(access(PIPE_NAME,F_OK) != 0){//如果文件存在
+        int err = mkfifo(PIPE_NAME,0777);
+        if(err != 0){
+				printf("Create fifo failed");
+            return -1;
+        }
+    }
+	system("./pipe_algo");
+    fd = open(PIPE_NAME, O_RDONLY);     //打开fifo文件
+    print_log("start pipe\n");
+	while(1) {
+	read(fd, buf, 11);                   //写入数据
+    print_log("read result is [%s].\n",buf);
+	}
+	close(fd);                           //关闭fifo文件 
     unlink("./myfifo"); 
 }
 #endif
